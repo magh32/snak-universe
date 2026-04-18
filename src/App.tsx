@@ -40,22 +40,30 @@ export default function App() {
   // Keyboard & TV Remote controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Log key for debugging if needed (invisible to user)
       const key = e.key;
       const keyCode = e.keyCode;
+      const code = e.code;
       
-      // Standard TV Remote Key Codes (Android TV, Tizen, WebOS)
+      // LOGGING FOR DEBUG (Visible in console during dev)
+      console.log(`Key: ${key}, Code: ${code}, KeyCode: ${keyCode}`);
+
+      // Expanded Android TV / Echolink Key Codes
       const isUp = key === "ArrowUp" || key === "Up" || keyCode === 38 || keyCode === 19;
       const isDown = key === "ArrowDown" || key === "Down" || keyCode === 40 || keyCode === 20;
       const isLeft = key === "ArrowLeft" || key === "Left" || keyCode === 37 || keyCode === 21;
       const isRight = key === "ArrowRight" || key === "Right" || keyCode === 39 || keyCode === 22;
-      const isConfirm = key === "Enter" || key === "OK" || keyCode === 13 || keyCode === 23 || key === " ";
-      const isPause = key === "p" || key === "P" || keyCode === 179 || keyCode === 19; // 179 is Play/Pause on some remotes
+      
+      // OK / Confirm button on Echolink can be 13 (Enter), 23 (DPAD_CENTER), or 66 (ENTER on some Androids)
+      const isConfirm = key === "Enter" || key === "OK" || key === "Select" || 
+                        keyCode === 13 || keyCode === 23 || keyCode === 66 || keyCode === 160;
+      
+      const isPause = key === "p" || key === "P" || keyCode === 179 || keyCode === 80;
 
       if (status === "PLAYING") {
-        // Prevent TV browser from scrolling or moving focus
+        // Force prevent default for ALL navigation keys to stop TV from moving focus
         if (isUp || isDown || isLeft || isRight || isConfirm) {
           e.preventDefault();
+          e.stopPropagation();
         }
 
         if (isUp) handleDirectionChange({ x: 0, y: -1 });
@@ -64,9 +72,10 @@ export default function App() {
         else if (isRight) handleDirectionChange({ x: 1, y: 0 });
         else if (isPause) setIsPaused(prev => !prev);
       } else {
-          // Support Start/Continue with OK/Enter
+          // In menus, OK/Confirm starts the game
           if (isConfirm) {
             e.preventDefault();
+            e.stopPropagation();
             if (status === "START") setStatus("LEVEL_SELECT");
             else if (status === "GAME_OVER") startGame(currentLevelIndex);
             else if (status === "LEVEL_COMPLETE") {
@@ -80,15 +89,25 @@ export default function App() {
       }
     };
 
-    // Ensure the window has focus to capture events
-    window.focus();
+    // TV TRAP: Ensure the app captures focus
+    const focusInterval = setInterval(() => {
+      if (document.activeElement?.tagName !== "INPUT") {
+         window.focus();
+      }
+    }, 1000);
     
-    window.addEventListener("keydown", handleKeyDown, true); // Use capture phase
-    return () => window.removeEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("keydown", handleKeyDown, { capture: true, passive: false });
+    return () => {
+      clearInterval(focusInterval);
+      window.removeEventListener("keydown", handleKeyDown, { capture: true });
+    };
   }, [handleDirectionChange, status, setIsPaused, currentLevelIndex, startGame, setStatus]);
 
   return (
-    <div className="min-h-screen bg-game-bg font-sans text-white overflow-hidden select-none">
+    <div 
+      className="min-h-screen bg-game-bg font-sans text-white overflow-hidden select-none outline-none"
+      tabIndex={0} // Makes the whole app focusable for TV browsers
+    >
       
       {/* Floating Info Elements (Replacing the obstructive HUD bar) */}
       {status === "PLAYING" && (
