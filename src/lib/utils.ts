@@ -1,0 +1,20 @@
+import { useEffect, useRef } from 'react';
+
+export function useInterval(callback: () => void, delay: number | null) {
+  const savedCallback = useRef<() => void>(null);
+
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (delay !== null) {
+      const id = setInterval(() => savedCallback.current?.(), delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+export const cn = (...classes: (string | undefined | boolean)[]) => {
+  return classes.filter(Boolean).join(' ');
+};

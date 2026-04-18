@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  
+  --color-game-bg: #1a2a3a;
+  --color-panel-bg: rgba(255, 255, 255, 0.1);
+  --color-accent: #4ade80;
+  --color-snake-head: #22c55e;
+  --color-snake-body: #86efac;
+  --color-food: #f87171;
+  --color-canvas-bg: #0f172a;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-game-bg);
+    color: white;
+  }
+}
+
+.glass {
+  background: var(--color-panel-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes pulse-custom {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.animate-pulse-custom {
+  animation: pulse-custom 2s infinite;
+}
