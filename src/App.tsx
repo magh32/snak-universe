@@ -40,18 +40,51 @@ export default function App() {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (status !== "PLAYING") return;
-      switch (e.key) {
-        case "ArrowUp": handleDirectionChange({ x: 0, y: -1 }); break;
-        case "ArrowDown": handleDirectionChange({ x: 0, y: 1 }); break;
-        case "ArrowLeft": handleDirectionChange({ x: -1, y: 0 }); break;
-        case "ArrowRight": handleDirectionChange({ x: 1, y: 0 }); break;
-        case "p": setIsPaused(prev => !prev); break;
+      // Support legacy TV keys (Up, Down, Left, Right) alongside modern Arrow keys
+      const key = e.key;
+      
+      if (status === "PLAYING") {
+        // Prevent TV browser from scrolling or moving focus when playing
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Up", "Down", "Left", "Right", " "].includes(key)) {
+          e.preventDefault();
+        }
+
+        switch (key) {
+          case "ArrowUp":
+          case "Up": 
+            handleDirectionChange({ x: 0, y: -1 }); break;
+          case "ArrowDown":
+          case "Down": 
+            handleDirectionChange({ x: 0, y: 1 }); break;
+          case "ArrowLeft":
+          case "Left": 
+            handleDirectionChange({ x: -1, y: 0 }); break;
+          case "ArrowRight":
+          case "Right": 
+            handleDirectionChange({ x: 1, y: 0 }); break;
+          case "p":
+          case "P":
+            setIsPaused(prev => !prev); break;
+        }
+      } else if (status === "START" || status === "GAME_OVER" || status === "LEVEL_COMPLETE") {
+          // Support "Enter" or "OK" button on TV remotes to start/continue
+          if (key === "Enter" || key === "OK" || key === " ") {
+            e.preventDefault();
+            if (status === "START") setStatus("LEVEL_SELECT");
+            if (status === "GAME_OVER") startGame(currentLevelIndex);
+            if (status === "LEVEL_COMPLETE") {
+               if (currentLevelIndex < LEVELS.length - 1) {
+                  startGame(currentLevelIndex + 1);
+                } else {
+                  setStatus("ALL_COMPLETE");
+                }
+            }
+          }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleDirectionChange, status, setIsPaused]);
+  }, [handleDirectionChange, status, setIsPaused, currentLevelIndex, startGame, setStatus]);
 
   return (
     <div className="min-h-screen bg-game-bg font-sans text-white overflow-hidden select-none">
