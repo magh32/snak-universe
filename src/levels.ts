@@ -12,7 +12,7 @@ const generateBox = (x1: number, y1: number, x2: number, y2: number): Point[] =>
 
 export const LEVELS: LevelConfig[] = Array.from({ length: 20 }, (_, i) => {
   const id = i + 1;
-  const speed = Math.max(80, 200 - (i * 7));
+  const speed = Math.max(80, 250 - (i * 8)); // Slower start (250ms), becomes challenging later
   const requiredScore = 5 + (i * 2);
   const gridSize = { width: 20, height: 20 };
   

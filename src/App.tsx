@@ -37,42 +37,39 @@ export default function App() {
 
   const { startGame, handleDirectionChange } = actions;
 
-  // Keyboard controls
+  // Keyboard & TV Remote controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Support legacy TV keys (Up, Down, Left, Right) alongside modern Arrow keys
+      // Log key for debugging if needed (invisible to user)
       const key = e.key;
+      const keyCode = e.keyCode;
       
+      // Standard TV Remote Key Codes (Android TV, Tizen, WebOS)
+      const isUp = key === "ArrowUp" || key === "Up" || keyCode === 38 || keyCode === 19;
+      const isDown = key === "ArrowDown" || key === "Down" || keyCode === 40 || keyCode === 20;
+      const isLeft = key === "ArrowLeft" || key === "Left" || keyCode === 37 || keyCode === 21;
+      const isRight = key === "ArrowRight" || key === "Right" || keyCode === 39 || keyCode === 22;
+      const isConfirm = key === "Enter" || key === "OK" || keyCode === 13 || keyCode === 23 || key === " ";
+      const isPause = key === "p" || key === "P" || keyCode === 179 || keyCode === 19; // 179 is Play/Pause on some remotes
+
       if (status === "PLAYING") {
-        // Prevent TV browser from scrolling or moving focus when playing
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Up", "Down", "Left", "Right", " "].includes(key)) {
+        // Prevent TV browser from scrolling or moving focus
+        if (isUp || isDown || isLeft || isRight || isConfirm) {
           e.preventDefault();
         }
 
-        switch (key) {
-          case "ArrowUp":
-          case "Up": 
-            handleDirectionChange({ x: 0, y: -1 }); break;
-          case "ArrowDown":
-          case "Down": 
-            handleDirectionChange({ x: 0, y: 1 }); break;
-          case "ArrowLeft":
-          case "Left": 
-            handleDirectionChange({ x: -1, y: 0 }); break;
-          case "ArrowRight":
-          case "Right": 
-            handleDirectionChange({ x: 1, y: 0 }); break;
-          case "p":
-          case "P":
-            setIsPaused(prev => !prev); break;
-        }
-      } else if (status === "START" || status === "GAME_OVER" || status === "LEVEL_COMPLETE") {
-          // Support "Enter" or "OK" button on TV remotes to start/continue
-          if (key === "Enter" || key === "OK" || key === " ") {
+        if (isUp) handleDirectionChange({ x: 0, y: -1 });
+        else if (isDown) handleDirectionChange({ x: 0, y: 1 });
+        else if (isLeft) handleDirectionChange({ x: -1, y: 0 });
+        else if (isRight) handleDirectionChange({ x: 1, y: 0 });
+        else if (isPause) setIsPaused(prev => !prev);
+      } else {
+          // Support Start/Continue with OK/Enter
+          if (isConfirm) {
             e.preventDefault();
             if (status === "START") setStatus("LEVEL_SELECT");
-            if (status === "GAME_OVER") startGame(currentLevelIndex);
-            if (status === "LEVEL_COMPLETE") {
+            else if (status === "GAME_OVER") startGame(currentLevelIndex);
+            else if (status === "LEVEL_COMPLETE") {
                if (currentLevelIndex < LEVELS.length - 1) {
                   startGame(currentLevelIndex + 1);
                 } else {
@@ -82,8 +79,12 @@ export default function App() {
           }
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    // Ensure the window has focus to capture events
+    window.focus();
+    
+    window.addEventListener("keydown", handleKeyDown, true); // Use capture phase
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [handleDirectionChange, status, setIsPaused, currentLevelIndex, startGame, setStatus]);
 
   return (
