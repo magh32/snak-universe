@@ -8,6 +8,8 @@ export interface PowerUp {
   active: boolean;
 }
 
+export type Difficulty = "EASY" | "MEDIUM" | "HARD";
+
 export interface LevelConfig {
   id: number;
   name: string;

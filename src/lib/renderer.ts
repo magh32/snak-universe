@@ -11,7 +11,8 @@ export const renderGame = (
   dir: Point,
   hasShield: boolean,
   isSlowed: boolean,
-  slowTimeTimeLeft: number
+  slowTimeTimeLeft: number,
+  time: number = 0
 ) => {
   const unit = canvasWidth / GRID_SIZE;
   const colors = level.colors;
@@ -34,11 +35,6 @@ export const renderGame = (
     ctx.stroke();
   }
 
-  // Canvas Inner Shadow (Simulated)
-  ctx.strokeStyle = "rgba(0,0,0,0.5)";
-  ctx.lineWidth = 10;
-  ctx.strokeRect(0, 0, canvasWidth, canvasHeight);
-
   // Draw Obstacles
   ctx.fillStyle = "rgba(255,255,255,0.2)";
   level.obstacles.forEach(o => {
@@ -48,6 +44,9 @@ export const renderGame = (
   });
 
   // Draw Food (Target)
+  const foodPulse = Math.sin(time / 150) * 2;
+  const foodSize = unit / 2.2 + foodPulse;
+
   if (level.educationalType === "NUMBERS") {
     ctx.fillStyle = colors.accent;
     ctx.font = `bold ${unit * 0.8}px Inter`;
@@ -62,23 +61,30 @@ export const renderGame = (
     const rainbowProps = ["#f87171", "#38bdf8", "#4ade80", "#fbbf24", "#d946ef"];
     ctx.fillStyle = rainbowProps[Math.floor(food.x + food.y) % rainbowProps.length];
     ctx.beginPath();
-    ctx.arc(food.x * unit + unit / 2, food.y * unit + unit / 2, unit / 2.2, 0, Math.PI * 2);
+    ctx.arc(food.x * unit + unit / 2, food.y * unit + unit / 2, foodSize, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.fillStyle = COLORS.FOOD;
     ctx.beginPath();
-    ctx.arc(food.x * unit + unit / 2, food.y * unit + unit / 2, unit / 2.2, 0, Math.PI * 2);
+    ctx.arc(food.x * unit + unit / 2, food.y * unit + unit / 2, foodSize, 0, Math.PI * 2);
     ctx.fill();
   }
   
   // Food sparkle
   ctx.fillStyle = "white";
   ctx.beginPath();
-  ctx.arc(food.x * unit + unit / 2.5, food.y * unit + unit / 2.5, 2, 0, Math.PI * 2);
+  const sparklePulse = Math.cos(time / 200) * 1;
+  ctx.arc(food.x * unit + unit / 2.5, food.y * unit + unit / 2.5, 2 + sparklePulse, 0, Math.PI * 2);
   ctx.fill();
 
   // Draw Snake
   snake.forEach((s, i) => {
+    // Undulation logic
+    const undulateSpeed = 0.01;
+    const undulateFreq = 0.6;
+    const undulateAmp = 1.5;
+    const undulate = Math.sin(time * undulateSpeed + i * undulateFreq) * undulateAmp;
+    
     if (i === 0) {
       ctx.fillStyle = isSlowed ? COLORS.ICE_BERRY : colors.snakeHead;
       ctx.shadowBlur = hasShield ? 25 : 15;
@@ -88,7 +94,8 @@ export const renderGame = (
         ctx.strokeStyle = COLORS.SNAKE_SHIELD_GLOW;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(s.x * unit + unit / 2, s.y * unit + unit / 2, unit / 2 + 2, 0, Math.PI * 2);
+        const shieldPulse = Math.sin(time / 100) * 3;
+        ctx.arc(s.x * unit + unit / 2, s.y * unit + unit / 2, unit / 2 + 3 + shieldPulse, 0, Math.PI * 2);
         ctx.stroke();
       }
     } else {
@@ -98,15 +105,19 @@ export const renderGame = (
     
     ctx.beginPath();
     const r = i === 0 ? 8 : 4;
-    const padding = i === 0 ? 1 : 2;
-    ctx.roundRect(s.x * unit + padding, s.y * unit + padding, unit - (padding * 2), unit - (padding * 2), r);
+    const padding = (i === 0 ? 1 : 2.5) + (undulate * 0.5);
+    const xPos = s.x * unit + padding;
+    const yPos = s.y * unit + padding;
+    const size = unit - (padding * 2);
+
+    ctx.roundRect(xPos, yPos, size, size, r);
     ctx.fill();
 
-    // Body Detail (Sleek pattern)
+    // Body Detail (Sleek inner pattern with matching undulation)
     if (i > 0 && i % 2 === 0) {
       ctx.fillStyle = "rgba(0,0,0,0.1)";
       ctx.beginPath();
-      ctx.arc(s.x * unit + unit / 2, s.y * unit + unit / 2, unit / 4, 0, Math.PI * 2);
+      ctx.arc(s.x * unit + unit / 2, s.y * unit + unit / 2, (unit / 4) + (undulate * 0.2), 0, Math.PI * 2);
       ctx.fill();
     }
 

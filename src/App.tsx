@@ -11,7 +11,6 @@ import {
   Pause,
 } from "lucide-react";
 import { cn } from "./lib/utils";
-import { LEVELS } from "./levels";
 import { useSnakeGame } from "./hooks/useSnakeGame";
 import { GameCanvas } from "./components/GameCanvas";
 
@@ -19,6 +18,7 @@ export default function App() {
   const { state, actions } = useSnakeGame();
   const { 
     status, setStatus,
+    difficulty, setDifficulty,
     currentLevelIndex, 
     unlockedLevel,
     snake,
@@ -32,7 +32,8 @@ export default function App() {
     showShieldBreak,
     isPaused, setIsPaused,
     highScore,
-    level
+    level,
+    levels
   } = state;
 
   const { startGame, handleDirectionChange } = actions;
@@ -79,7 +80,7 @@ export default function App() {
             if (status === "START") setStatus("LEVEL_SELECT");
             else if (status === "GAME_OVER") startGame(currentLevelIndex);
             else if (status === "LEVEL_COMPLETE") {
-               if (currentLevelIndex < LEVELS.length - 1) {
+               if (currentLevelIndex < levels.length - 1) {
                   startGame(currentLevelIndex + 1);
                 } else {
                   setStatus("ALL_COMPLETE");
@@ -189,7 +190,25 @@ export default function App() {
                <Gamepad2 className="w-32 h-32 text-accent relative drop-shadow-[0_0_20px_rgba(74,222,128,0.5)]" />
             </div>
             <h1 className="text-6xl md:text-[10vw] lg:text-9xl font-black mb-4 leading-none tracking-tighter italic text-center">SNAKE<br/><span className="text-accent underline underline-offset-8">ODYSSEY</span></h1>
-            <p className="text-white/40 mb-12 max-w-xs md:max-w-md mx-auto text-sm md:text-lg font-medium tracking-wide uppercase text-center">Mission: Navigate 20 levels of digital danger</p>
+            <p className="text-white/40 mb-8 max-w-xs md:max-w-md mx-auto text-sm md:text-lg font-medium tracking-wide uppercase text-center">Mission: Navigate 20 levels of digital danger</p>
+            
+            <div className="flex gap-2 mb-8 p-1 glass rounded-2xl">
+              {(["EASY", "MEDIUM", "HARD"] as const).map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficulty(diff)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs font-black transition-all",
+                    difficulty === diff 
+                      ? "bg-accent text-slate-900 shadow-lg shadow-accent/20" 
+                      : "text-white/40 hover:text-white"
+                  )}
+                >
+                  {diff}
+                </button>
+              ))}
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm md:max-w-md">
               <button 
                 onClick={() => setStatus("LEVEL_SELECT")}
@@ -231,7 +250,7 @@ export default function App() {
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar grid grid-cols-2 lg:grid-cols-4 gap-6 pb-20 max-w-7xl mx-auto w-full">
-              {LEVELS.map((lv, i) => {
+              {levels.map((lv, i) => {
                 const isLocked = lv.id > unlockedLevel;
                 return (
                   <button
@@ -313,7 +332,7 @@ export default function App() {
                   </button>
                   <button 
                     onClick={() => {
-                      if (currentLevelIndex < LEVELS.length - 1) {
+                      if (currentLevelIndex < levels.length - 1) {
                         startGame(currentLevelIndex + 1);
                       } else {
                         setStatus("ALL_COMPLETE");

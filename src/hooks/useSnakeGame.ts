@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { Point, GameStatus, LevelConfig } from "../types";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { Point, GameStatus, LevelConfig, Difficulty } from "../types";
 import { 
   GRID_SIZE, 
   INITIAL_SNAKE, 
@@ -7,12 +7,13 @@ import {
   STARS_PER_REWARD,
   SCORE_PER_STAR
 } from "../constants";
-import { LEVELS } from "../levels";
+import { generateLevels } from "../levels";
 import { useInterval } from "../lib/utils";
 import { SoundService } from "../services/soundService";
 
 export const useSnakeGame = () => {
   const [status, setStatus] = useState<GameStatus>("START");
+  const [difficulty, setDifficulty] = useState<Difficulty>("MEDIUM");
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [unlockedLevel, setUnlockedLevel] = useState(1);
   const [snake, setSnake] = useState<Point[]>(INITIAL_SNAKE);
@@ -27,7 +28,8 @@ export const useSnakeGame = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [highScore, setHighScore] = useState(0);
 
-  const level = LEVELS[currentLevelIndex];
+  const levels = useMemo(() => generateLevels(difficulty), [difficulty]);
+  const level = levels[currentLevelIndex];
 
   // Slow time countdown
   useEffect(() => {
@@ -87,7 +89,7 @@ export const useSnakeGame = () => {
     setIsSlowed(false);
     setSlowTimeTimeLeft(0);
     setIsPaused(false);
-    spawnFood(INITIAL_SNAKE, LEVELS[index].obstacles);
+    spawnFood(INITIAL_SNAKE, levels[index].obstacles);
     setStatus("PLAYING");
   }, [spawnFood]);
 
@@ -199,6 +201,7 @@ export const useSnakeGame = () => {
   return {
     state: {
       status, setStatus,
+      difficulty, setDifficulty,
       currentLevelIndex, setCurrentLevelIndex,
       unlockedLevel,
       snake,
@@ -212,7 +215,8 @@ export const useSnakeGame = () => {
       showShieldBreak,
       isPaused, setIsPaused,
       highScore,
-      level
+      level,
+      levels
     },
     actions: {
       startGame,

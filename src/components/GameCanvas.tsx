@@ -38,7 +38,31 @@ export const GameCanvas = ({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    renderGame(ctx, canvas.width, canvas.height, snake, food, level, dir, hasShield, isSlowed, slowTimeTimeLeft);
+
+    let animationId: number;
+
+    const render = () => {
+      renderGame(
+        ctx, 
+        canvas.width, 
+        canvas.height, 
+        snake, 
+        food, 
+        level, 
+        dir, 
+        hasShield, 
+        isSlowed, 
+        slowTimeTimeLeft,
+        performance.now()
+      );
+      animationId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
   }, [snake, food, level, dir, hasShield, isSlowed, slowTimeTimeLeft]);
 
   return (
