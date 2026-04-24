@@ -9,6 +9,7 @@ import {
 } from "../constants";
 import { LEVELS } from "../levels";
 import { useInterval } from "../lib/utils";
+import { SoundService } from "../services/soundService";
 
 export const useSnakeGame = () => {
   const [status, setStatus] = useState<GameStatus>("START");
@@ -76,6 +77,7 @@ export const useSnakeGame = () => {
   }, []);
 
   const startGame = useCallback((index: number) => {
+    SoundService.resumeContext();
     setCurrentLevelIndex(index);
     setSnake(INITIAL_SNAKE);
     setDir(INITIAL_DIR);
@@ -90,11 +92,13 @@ export const useSnakeGame = () => {
   }, [spawnFood]);
 
   const handleLevelComplete = useCallback(() => {
+    SoundService.playLevelComplete();
     setStatus("LEVEL_COMPLETE");
     saveProgress(currentLevelIndex + 2);
   }, [currentLevelIndex, saveProgress]);
 
   const handleGameOver = useCallback(() => {
+    SoundService.playGameOver();
     setStatus("GAME_OVER");
     setHighScore(prev => {
       const next = Math.max(prev, score);
@@ -104,6 +108,7 @@ export const useSnakeGame = () => {
   }, [score]);
 
   const useShield = useCallback(() => {
+    SoundService.playShieldBreak();
     setHasShield(false);
     setShowShieldBreak(true);
     setTimeout(() => setShowShieldBreak(false), 500);
@@ -144,10 +149,12 @@ export const useSnakeGame = () => {
 
     // Food collision
     if (head.x === food.x && head.y === food.y) {
+      SoundService.playEat();
       const newScore = score + 1;
       setScore(newScore);
       
       if (newScore % SCORE_PER_STAR === 0) {
+        SoundService.playCollectStar();
         // Reward: Every 6 points (2nd star) give Slow Motion
         if (newScore % 6 === 0) {
           setIsSlowed(true);
@@ -156,6 +163,7 @@ export const useSnakeGame = () => {
 
         const nextStars = stars + 1;
         if (nextStars >= STARS_PER_REWARD) {
+          SoundService.playShield();
           setStars(0);
           setHasShield(true);
         } else {
