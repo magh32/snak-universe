@@ -109,46 +109,46 @@ export default function App() {
       tabIndex={0} // Makes the whole app focusable for TV browsers
     >
       
-      {/* Mobile Top Bar HUD (Clean & Non-obstructive) */}
+      {/* Mobile Top Bar HUD (Floating & Transparent) */}
       {status === "PLAYING" && (
-        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/5 md:bg-transparent md:backdrop-blur-none md:border-none md:top-8 md:px-8">
-          <div className="flex items-center gap-3">
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 pointer-events-none md:top-8 md:px-8">
+          <div className="flex items-center gap-3 pointer-events-auto">
             <button 
               onClick={() => setStatus("START")} 
-              className="p-2 glass rounded-xl text-accent hover:scale-110 transition-transform border border-white/10"
+              className="p-3 glass rounded-2xl text-accent hover:scale-110 transition-transform border border-white/10 shadow-xl"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-8 h-8" />
             </button>
-            <div className="flex flex-col">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-white/40 leading-none">Sector</span>
-              <span className="text-lg font-black text-accent font-mono">{level.id}</span>
+            <div className="flex flex-col bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-white/5">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 leading-none mb-1">Sector</span>
+              <span className="text-xl font-black text-accent font-mono leading-none">{level.id}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <span className="text-[9px] font-bold uppercase text-white/40 leading-none">Score</span>
-              <span className="text-xl font-black text-accent font-mono italic">{score.toString().padStart(5, '0')}</span>
+          <div className="flex items-center gap-3 pointer-events-auto">
+            <div className="flex flex-col items-end bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-2xl border border-white/5">
+              <span className="text-[10px] font-bold uppercase text-white/50 leading-none mb-1">Score</span>
+              <span className="text-2xl font-black text-accent font-mono italic leading-none">{score.toString().padStart(5, '0')}</span>
             </div>
             <button 
               onClick={() => setIsPaused(!isPaused)} 
-              className="p-2.5 glass rounded-xl text-accent hover:scale-110 transition-transform border border-white/10"
+              className="p-3 glass rounded-2xl text-accent hover:scale-110 transition-transform border border-white/10 shadow-xl"
             >
-              {isPaused ? <Play className="w-6 h-6 fill-accent" /> : <Pause className="w-6 h-6" />}
+              {isPaused ? <Play className="w-8 h-8 fill-accent" /> : <Pause className="w-8 h-8" />}
             </button>
           </div>
         </div>
       )}
 
-      {/* Stars under HUD for mobile */}
+      {/* Stars floating near top for mobile */}
       {status === "PLAYING" && (
-        <div className="fixed top-16 left-0 right-0 flex justify-center gap-1 z-40 md:top-28 md:right-8 md:left-auto md:justify-end md:px-8">
+        <div className="fixed top-[100px] left-0 right-0 flex justify-center gap-1.5 z-40 md:top-32 md:right-8 md:left-auto md:justify-end md:px-8 pointer-events-none">
           {[...Array(5)].map((_, i) => (
             <Star 
               key={i} 
               className={cn(
-                "w-3 h-3 transition-all duration-300", 
-                i < stars ? "fill-accent text-accent" : "text-white/10"
+                "w-4 h-4 transition-all duration-300", 
+                i < stars ? "fill-accent text-accent" : "text-white/5 shadow-inner"
               )} 
             />
           ))}

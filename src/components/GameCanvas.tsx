@@ -46,7 +46,7 @@ export const GameCanvas = ({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
-      className="flex flex-col items-center justify-center min-h-screen w-full px-4 pt-8 md:pt-0"
+      className="flex flex-col items-center justify-center min-h-screen w-full px-4 pt-4 md:pt-0"
     >
       <div className="relative group p-2 md:p-6 bg-white/5 backdrop-blur-xl rounded-[40px] border-4 md:border-8 border-white/5 shadow-2xl">
         <canvas 
@@ -111,7 +111,7 @@ export const GameCanvas = ({
 const ControlKey = ({ onClick, icon }: { onClick: () => void, icon: React.ReactNode }) => (
   <button 
     onPointerDown={(e) => { e.preventDefault(); onClick(); }} 
-    className="aspect-square flex items-center justify-center glass rounded-2xl shadow-lg active:scale-90 active:bg-white/10 transition-all text-accent border border-white/5"
+    className="aspect-square flex items-center justify-center glass rounded-3xl shadow-xl active:scale-90 active:bg-white/10 transition-all text-accent border border-white/10"
   >
     {icon}
   </button>
