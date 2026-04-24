@@ -109,40 +109,50 @@ export default function App() {
       tabIndex={0} // Makes the whole app focusable for TV browsers
     >
       
-      {/* Floating Info Elements (Replacing the obstructive HUD bar) */}
+      {/* Mobile Top Bar HUD (Clean & Non-obstructive) */}
       {status === "PLAYING" && (
-        <>
-          <div className="fixed top-8 left-8 z-50 flex flex-col gap-2">
-            <button onClick={() => setStatus("START")} className="p-3 glass rounded-2xl text-accent hover:scale-110 transition-transform w-fit border border-white/10 shadow-xl">
-              <ChevronLeft className="w-8 h-8" />
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/5 md:bg-transparent md:backdrop-blur-none md:border-none md:top-8 md:px-8">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setStatus("START")} 
+              className="p-2 glass rounded-xl text-accent hover:scale-110 transition-transform border border-white/10"
+            >
+              <ChevronLeft className="w-6 h-6" />
             </button>
-            <div className="bg-white/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 shadow-xl">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 block -mb-1">Sector</span>
-              <span className="text-xl font-black text-accent font-mono tracking-tighter">{level.id}</span>
+            <div className="flex flex-col">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-white/40 leading-none">Sector</span>
+              <span className="text-lg font-black text-accent font-mono">{level.id}</span>
             </div>
           </div>
 
-          <div className="fixed top-8 right-8 z-50 flex flex-col items-end gap-2">
-            <button onClick={() => setIsPaused(!isPaused)} className="p-4 glass rounded-2xl text-accent hover:scale-110 transition-transform shadow-xl border border-white/10">
-              {isPaused ? <Play className="w-8 h-8 fill-accent" /> : <Pause className="w-8 h-8" />}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-bold uppercase text-white/40 leading-none">Score</span>
+              <span className="text-xl font-black text-accent font-mono italic">{score.toString().padStart(5, '0')}</span>
+            </div>
+            <button 
+              onClick={() => setIsPaused(!isPaused)} 
+              className="p-2.5 glass rounded-xl text-accent hover:scale-110 transition-transform border border-white/10"
+            >
+              {isPaused ? <Play className="w-6 h-6 fill-accent" /> : <Pause className="w-6 h-6" />}
             </button>
-            <div className="bg-white/5 backdrop-blur-md px-6 py-2 rounded-2xl border border-white/10 shadow-xl text-right">
-              <span className="text-[10px] font-bold uppercase text-white/50 block -mb-1">Score</span>
-              <span className="text-2xl font-black text-accent font-mono italic">{score.toString().padStart(5, '0')}</span>
-            </div>
-            <div className="flex gap-1 mt-1">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={cn(
-                    "w-4 h-4 transition-all duration-300", 
-                    i < stars ? "fill-accent text-accent" : "text-white/10"
-                  )} 
-                />
-              ))}
-            </div>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Stars under HUD for mobile */}
+      {status === "PLAYING" && (
+        <div className="fixed top-16 left-0 right-0 flex justify-center gap-1 z-40 md:top-28 md:right-8 md:left-auto md:justify-end md:px-8">
+          {[...Array(5)].map((_, i) => (
+            <Star 
+              key={i} 
+              className={cn(
+                "w-3 h-3 transition-all duration-300", 
+                i < stars ? "fill-accent text-accent" : "text-white/10"
+              )} 
+            />
+          ))}
+        </div>
       )}
 
       {/* Global Overlays (Flash Effects) */}
@@ -178,9 +188,9 @@ export default function App() {
                />
                <Gamepad2 className="w-32 h-32 text-accent relative drop-shadow-[0_0_20px_rgba(74,222,128,0.5)]" />
             </div>
-            <h1 className="text-[10vw] lg:text-9xl font-black mb-4 leading-none tracking-tighter italic">SNAKE<br/><span className="text-accent underline underline-offset-8">ODYSSEY</span></h1>
-            <p className="text-white/40 mb-12 max-w-md mx-auto text-lg font-medium tracking-wide uppercase">Mission: Navigate 20 levels of digital danger</p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+            <h1 className="text-6xl md:text-[10vw] lg:text-9xl font-black mb-4 leading-none tracking-tighter italic text-center">SNAKE<br/><span className="text-accent underline underline-offset-8">ODYSSEY</span></h1>
+            <p className="text-white/40 mb-12 max-w-xs md:max-w-md mx-auto text-sm md:text-lg font-medium tracking-wide uppercase text-center">Mission: Navigate 20 levels of digital danger</p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm md:max-w-md">
               <button 
                 onClick={() => setStatus("LEVEL_SELECT")}
                 className="flex-1 px-12 py-8 bg-accent text-slate-900 rounded-[32px] text-3xl font-black shadow-2xl shadow-accent/40 hover:scale-105 transition-transform active:scale-95 flex items-center justify-center gap-4"
@@ -292,12 +302,12 @@ export default function App() {
                     className="absolute -inset-8 border-2 border-dashed border-accent/20 rounded-full"
                   />
                 </motion.div>
-                <h1 className="text-8xl font-black text-white mb-4 tracking-tighter italic leading-none">SECTOR<br/><span className="text-accent underline">SECURED</span></h1>
-                <p className="text-lg text-white/40 mb-12 font-bold tracking-widest uppercase">Score: {score} // Sector {level.id}</p>
-                <div className="flex gap-4 max-w-md mx-auto">
+                <h1 className="text-6xl md:text-8xl font-black text-white mb-4 tracking-tighter italic leading-none">SECTOR<br/><span className="text-accent underline">SECURED</span></h1>
+                <p className="text-sm md:text-lg text-white/40 mb-12 font-bold tracking-widest uppercase">Score: {score} // Sector {level.id}</p>
+                <div className="flex flex-col md:flex-row gap-4 max-w-sm md:max-w-md mx-auto w-full px-6 md:px-0">
                    <button 
                     onClick={() => setStatus("LEVEL_SELECT")}
-                    className="flex-1 p-8 glass rounded-[32px] text-white/50 font-bold hover:bg-white/10"
+                    className="flex-1 p-5 md:p-8 glass rounded-[24px] md:rounded-[32px] text-white/50 font-bold hover:bg-white/10"
                    >
                      EXIT
                   </button>
@@ -309,7 +319,7 @@ export default function App() {
                         setStatus("ALL_COMPLETE");
                       }
                     }}
-                    className="flex-[2] py-8 bg-accent text-slate-900 rounded-[32px] text-2xl font-black shadow-2xl shadow-accent/40 active:scale-95 flex items-center justify-center gap-4"
+                    className="flex-[2] py-5 md:py-8 bg-accent text-slate-900 rounded-[24px] md:rounded-[32px] text-xl md:text-2xl font-black shadow-2xl shadow-accent/40 active:scale-95 flex items-center justify-center gap-4"
                   >
                     NEXT SECTOR <ChevronRight className="w-8 h-8" />
                   </button>
@@ -327,19 +337,19 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-red-500/10 backdrop-blur-3xl z-50 flex flex-col items-center justify-center"
           >
-             <div className="text-center p-12 glass rounded-[60px] border-4 border-red-500/20 max-w-xl">
-                <h1 className="text-8xl font-black text-white mb-4 tracking-tighter italic leading-none">SYSTEM<br/><span className="text-red-500">FAILED</span></h1>
-                <p className="text-lg text-white/40 mb-12 font-bold tracking-widest uppercase">Sector {level.id} // Connection Lost</p>
-                <div className="flex gap-4">
+             <div className="text-center p-6 md:p-12 glass rounded-[40px] md:rounded-[60px] border-4 border-red-500/20 max-w-sm md:max-w-xl mx-4">
+                <h1 className="text-6xl md:text-8xl font-black text-white mb-4 tracking-tighter italic leading-none">SYSTEM<br/><span className="text-red-500">FAILED</span></h1>
+                <p className="text-sm md:text-lg text-white/40 mb-12 font-bold tracking-widest uppercase">Sector {level.id} // Connection Lost</p>
+                <div className="flex flex-col md:flex-row gap-4 w-full">
                   <button 
                     onClick={() => setStatus("LEVEL_SELECT")}
-                    className="flex-1 p-8 glass rounded-[32px] text-white/50 font-bold hover:bg-white/10"
+                    className="flex-1 p-5 md:p-8 glass rounded-[24px] md:rounded-[32px] text-white/50 font-bold hover:bg-white/10"
                   >
                     DISCONNECT
                   </button>
                   <button 
                     onClick={() => startGame(currentLevelIndex)}
-                    className="flex-[2] py-8 bg-accent text-slate-900 rounded-[32px] text-2xl font-black shadow-2xl shadow-accent/40 active:scale-95 flex items-center justify-center gap-4"
+                    className="flex-[2] py-5 md:py-8 bg-accent text-slate-900 rounded-[24px] md:rounded-[32px] text-xl md:text-2xl font-black shadow-2xl shadow-accent/40 active:scale-95 flex items-center justify-center gap-4"
                   >
                     RETRY <RotateCcw className="w-8 h-8" />
                   </button>
@@ -371,13 +381,13 @@ export default function App() {
                     </motion.div>
                   </div>
                 </div>
-                <h1 className="text-8xl font-black text-white mb-8 leading-none tracking-tighter italic">ODYSSEY<br/><span className="text-accent underline underline-offset-[20px] decoration-white/10">MASTERED</span></h1>
-                <p className="text-2xl text-white/60 mb-16 max-w-md mx-auto leading-relaxed font-medium">
+                <h1 className="text-6xl md:text-8xl font-black text-white mb-8 leading-none tracking-tighter italic">ODYSSEY<br/><span className="text-accent underline underline-offset-[20px] decoration-white/10">MASTERED</span></h1>
+                <p className="text-lg md:text-2xl text-white/60 mb-16 max-w-xs md:max-w-md mx-auto leading-relaxed font-medium">
                   Elite status achieved. You have navigated every digital landscape in the Odyssey.
                 </p>
                 <button 
                   onClick={() => setStatus("START")}
-                  className="px-24 py-10 bg-accent text-slate-900 rounded-[40px] text-4xl font-black shadow-2xl shadow-accent/40 hover:scale-105 transition-transform active:scale-95"
+                  className="px-16 md:px-24 py-8 md:py-10 bg-accent text-slate-900 rounded-[32px] md:rounded-[40px] text-2xl md:text-4xl font-black shadow-2xl shadow-accent/40 hover:scale-105 transition-transform active:scale-95"
                 >
                   FINISH
                 </button>
