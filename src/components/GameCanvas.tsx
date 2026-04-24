@@ -46,7 +46,7 @@ export const GameCanvas = ({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
-      className="flex flex-col items-center justify-center min-h-screen w-full px-4 pt-16 md:pt-0"
+      className="flex flex-col items-center justify-center min-h-screen w-full px-4 pt-8 md:pt-0"
     >
       <div className="relative group p-2 md:p-6 bg-white/5 backdrop-blur-xl rounded-[40px] border-4 md:border-8 border-white/5 shadow-2xl">
         <canvas 
@@ -79,16 +79,10 @@ export const GameCanvas = ({
           )}
         </AnimatePresence>
 
-        {/* Mission Text Overlay */}
-        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 glass px-6 py-2 rounded-full text-accent font-bold text-[10px] md:text-xs tracking-wider border border-accent/20 animate-pulse-custom pointer-events-none whitespace-nowrap z-10">
-          {level.educationalType === "NUMBERS" ? "MISSION: COLLECT THE NUMBERS" : 
-           level.educationalType === "COLORS" ? "MISSION: COLLECT THE COLORS" : 
-           "MISSION: COLLECT THE MAGIC FRUITS"}
-        </div>
       </div>
 
       {/* Mobile Controls (Recalibrated for touch) */}
-      <div className="mt-16 grid grid-cols-3 gap-3 md:hidden w-full max-w-[260px]">
+      <div className="mt-8 grid grid-cols-3 gap-3 md:hidden w-full max-w-[260px]">
          <div />
          <ControlKey onClick={() => onMove({ x: 0, y: -1 })} icon={<ChevronUp className="w-8 h-8" />} />
          <div />
